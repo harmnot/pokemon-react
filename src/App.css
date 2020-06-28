@@ -30,12 +30,15 @@ video {
     color: #4E4B4F;
 }
 .box {
+    cursor: pointer;
     width: 296px;
     height: 170px;
 }
+
 .ro {
     border-radius: 18px;
 }
+
 .item-box {
     line-height: 26px;
     font-size: 23px;

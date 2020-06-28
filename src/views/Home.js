@@ -1,6 +1,6 @@
 import React from "react";
 import { types } from "../type";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 const Home = () => {
     return(
@@ -51,6 +51,7 @@ const Cover = () => {
 
 const Choose = () => {
     const history = useHistory();
+    const location = useLocation()
     const renderType = () => {
         return types.map((value, index) => (
             <div className="col-sm-6 col-lg-6 my-2" key={index}>
@@ -63,12 +64,28 @@ const Choose = () => {
             </div>
          ))
     }
+
     const handleClick = (i) => {
       history.push(`/${i}`)
     }
+
+    const homePageButton = () => {
+        if(location.pathname !== "/") {
+            return (
+                <>
+                    <h5> Homepage </h5>
+                    <div className="col-xs-12 mx-auto mt-2 mb-4">
+                        <Badge name="Homepage" color="green" src={""} click={handleClick} route=""/>
+                    </div>
+                </>
+            )
+        }
+    }
+
     return(
         <div className="d-flex flex-column">
             <div className="d-flex flex-column my-3">
+                {homePageButton()}
                 <h5> All Pokemon </h5>
                 <div className="col-xs-12 mx-auto mt-2 mb-4">
                     <Badge name="Browse Pokemon" color="#614051" src={""} click={handleClick} route="all/pokemon"/>
@@ -106,4 +123,4 @@ const Badge = ({name, color, src, click, route}) => {
 }
 
 
-export { Home, MainChoose, Choose }
+export { Home, MainChoose, Choose, Badge }

@@ -59,7 +59,6 @@ class List extends React.Component {
             return poke.results.map(resp => resp.url)
         } else {
             poke = await P.getTypeByName(this.props.match.params.type)
-            console.log(poke)
             return poke.pokemon.map(v => v.pokemon.url )
         }
     }
@@ -73,6 +72,7 @@ class List extends React.Component {
                     const img = "https://www.clipartmax.com/png/middle/129-1298368_ref-pokeball-transparent-background.png"
                     result.push(
                         {
+                            id: value["id"],
                             name: value["name"],
                             pic: value["sprites"]["front_default"] ? value["sprites"]["front_default"] : img ,
                             types: value["types"].map(arrType => arrType["type"]["name"])
@@ -82,10 +82,15 @@ class List extends React.Component {
                 if(this.props.match.params.type !== "pokemon") {
                     const slice = result.slice(this.state.perPage, this.state.limitTYpe)
                     this.setState({data: [...this.state.data, ...slice]})
+                    // eslint-disable-next-line
                     this.setState({perPage: this.state.limitTYpe++})
                     this.setState({limitTYpe: this.state.perPage+ this.state.limitTYpe})
                 } else {
-                    this.setState({page: this.state.page += 1 + 20})
+                    this.setState(prev => {
+                        return {
+                            page: prev.page += 1 + 20
+                        }
+                    })
                     this.setState({data: [...this.state.data, ...result]})
                 }
 
@@ -114,7 +119,9 @@ class List extends React.Component {
                             name={value.name}
                             source={!value.pic ? `no-poke-1.jpg` : value.pic}
                             types={value.types}
-                            c={index}/>
+                            c={index}
+                            id={value.id}
+                        />
                     </div>
                 ))}
             </div>
@@ -172,7 +179,7 @@ class List extends React.Component {
                             dataLength={this.state.data.length}
                             next={this.fetchMoreData}
                             hasMore={this.state.hasMore}
-                        >
+                       >
                             {this.Items()}
                         </InfiniteScroll>
                     </div>

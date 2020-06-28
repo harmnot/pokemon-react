@@ -2,8 +2,15 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+test('should renders root', () => {
   const { getByText } = render(<App />);
-  const linkElement = getByText(/learn react/i);
+  const linkElement = getByText(/Browse/i);
   expect(linkElement).toBeInTheDocument();
 });
+
+test('should show Title Logo For Homepage', () => {
+  const { getByText } = render(<App />);
+  const head = getByText(/WARUNG/i);
+  expect(head).toBeInTheDocument()
+});
+

@@ -20,14 +20,14 @@ const closeNavBar = () => {
 const Navbar = () => {
     return(
         <div className="bg-y-2 py-2 px-4">
-            <div id="open-side-panel" className="sidepanel bg-y-2">
-                <a className="closebtn" onClick={closeNavBar}>×</a>
+            <div id="open-side-panel" className="sidepanel bg-y-2" role="openfirst">
+                <a  href="# " className="closebtn" onClick={closeNavBar}>×</a >
                 <div className="col-lg-8 mx-auto mt-5">
                     <Choose />
                 </div>
             </div>
             <div className="d-flex flex-row justify-content-between">
-                <span onClick={navBarAction} style={{cursor: "pointer"}}> ☰ </span>
+                <span onClick={navBarAction} style={{cursor: 'pointer'}}> ☰ </span>
                 <span className="logo"> warung pokemon </span>
             </div>
         </div>
