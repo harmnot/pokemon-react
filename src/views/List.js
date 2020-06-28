@@ -3,12 +3,14 @@ import P from "../Api";
 import Card from "../components/Card";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Route } from "react-router-dom";
-import { Choose} from "./Home";
+import Navbar from "../components/Navbar";
 
 class List extends React.Component {
     state = {
         data: [],
         hasMore: true,
+        limitTYpe: 20,
+        perPage: 0,
         page: 1
     };
 
@@ -22,17 +24,25 @@ class List extends React.Component {
         }
     }
 
-
     refresh = () => {
         this.setD()
-        this.checkRender()
         this.fetchMoreData()
+        this.checkRender()
     }
 
 
     setD = () => {
+        if(this.props.match.params.type !== "pokemon") {
+            this.setState({data: []})
+            this.setState({page: 0})
+        } else {
+            this.fetchMoreData()
+            this.setState({data: []})
+            this.fetchMoreData()
+        }
         this.setState({data: []})
-        this.setState({page: 0})
+        this.setState({limitTYpe: 20})
+        this.setState({perPage: 0})
     }
 
     getAll = async () => {
@@ -49,6 +59,7 @@ class List extends React.Component {
             return poke.results.map(resp => resp.url)
         } else {
             poke = await P.getTypeByName(this.props.match.params.type)
+            console.log(poke)
             return poke.pokemon.map(v => v.pokemon.url )
         }
     }
@@ -68,13 +79,13 @@ class List extends React.Component {
                         }
                     )
                 }
-                this.setState({page: this.state.page += 1 + 20})
                 if(this.props.match.params.type !== "pokemon") {
-                    if(result.length === 0) {
-                        this.setState({ hasMore: false });
-                    }
-                    this.setState({data: [...this.state.data, ...result]})
+                    const slice = result.slice(this.state.perPage, this.state.limitTYpe)
+                    this.setState({data: [...this.state.data, ...slice]})
+                    this.setState({perPage: this.state.limitTYpe++})
+                    this.setState({limitTYpe: this.state.perPage+ this.state.limitTYpe})
                 } else {
+                    this.setState({page: this.state.page += 1 + 20})
                     this.setState({data: [...this.state.data, ...result]})
                 }
 
@@ -92,6 +103,22 @@ class List extends React.Component {
                 <h3 className="my-5 text-center"> List all Pokemon type of {this.props.match.params.type} </h3>
             )
         }
+    }
+
+    Items = () => {
+        return (
+            <div className="d-flex flex-row flex-wrap justify-content-center card-list">
+                {this.state.data.map((value, index) => (
+                    <div key={index} className="">
+                        <Card
+                            name={value.name}
+                            source={!value.pic ? `no-poke-1.jpg` : value.pic}
+                            types={value.types}
+                            c={index}/>
+                    </div>
+                ))}
+            </div>
+        )
     }
 
     checkRender = () => {
@@ -134,69 +161,30 @@ class List extends React.Component {
                                 </div>
                             }
                         >
-                            <div className="d-flex flex-row flex-wrap justify-content-center card-list">
-                                {this.state.data.map((value, index) => (
-                                    <div key={index} className="">
-                                        <Card
-                                            name={value.name}
-                                            source={!value.pic ? `no-poke-1.jpg` : value.pic}
-                                            types={value.types}
-                                            c={index}/>
-                                    </div>
-                                ))}
-                            </div>
+                            {this.Items()}
                         </InfiniteScroll>
                     </div>
                 )
             } else {
                 return (
                     <div id="list-poke">
-                        <div className="d-flex flex-row flex-wrap justify-content-center card-list">
-                            {this.state.data.map((value, index) => (
-                                <div key={index} className="">
-                                    <Card
-                                        name={value.name}
-                                        source={!value.pic ? `no-poke-1.jpg` : value.pic}
-                                        types={value.types}
-                                        c={index}/>
-                                </div>
-                            ))}
-                        </div>
+                        <InfiniteScroll
+                            dataLength={this.state.data.length}
+                            next={this.fetchMoreData}
+                            hasMore={this.state.hasMore}
+                        >
+                            {this.Items()}
+                        </InfiniteScroll>
                     </div>
                 )
             }
         }
     }
 
-    navBarAction = () => {
-        const nav = document.getElementById("open-side-panel")
-        if(nav) {
-            nav.style.width = "60vw";
-        }
-    }
-
-    closeNavBar = () => {
-        const nav = document.getElementById("open-side-panel")
-        if(nav) {
-            nav.style.width = "0";
-        }
-    }
-
     render() {
         return (
             <>
-                <div className="bg-y-2 py-2 px-4">
-                    <div id="open-side-panel" className="sidepanel bg-y-2">
-                        <a className="closebtn" onClick={this.closeNavBar}>×</a>
-                        <div className="col-lg-8 mx-auto mt-5">
-                            <Choose />
-                        </div>
-                    </div>
-                    <div className="d-flex flex-row justify-content-between">
-                        <span onClick={this.navBarAction} className="align-self-baseline"> ☰ </span>
-                        <span className="logo"> warung pokemon </span>
-                    </div>
-                </div>
+                <Navbar/>
                 <Route exact path={`/all/:type`}>
                     {this.title()}
                     {this.checkRender()}
